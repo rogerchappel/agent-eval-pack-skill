@@ -10,7 +10,9 @@
     "test": "node --test",
     "check": "node --check src/index.js && node --check bin/agent-eval-pack.js",
     "build": "node scripts/build.js",
-    "smoke": "node bin/agent-eval-pack.js build fixtures/success-run.md --out dist/smoke"
+    "smoke": "node bin/agent-eval-pack.js build fixtures/success-run.md --out dist/smoke",
+    "package:smoke": "npm pack --dry-run",
+    "release:check": "npm run check && npm test && npm run build && npm run smoke && npm run package:smoke"
   },
   "keywords": [
     "agent-evals",
