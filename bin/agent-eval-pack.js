@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { buildEvalPack, renderBrief, validateEvalPack } from "../src/index.js";
+import { buildEvalPack, renderBrief, summarizeEvalPack, validateEvalPack } from "../src/index.js";
 
 function help() {
   console.log(`agent-eval-pack
 
 Usage:
   agent-eval-pack init [--out dir]
-  agent-eval-pack build <input.md> [--out dir] [--stdout]
+  agent-eval-pack build <input.md...> [--out dir] [--stdout] [--summary] [--id-prefix text]
   agent-eval-pack validate <evals.json> [--require-commands]`);
 }
 
@@ -22,16 +22,68 @@ if (!command || command === "--help" || command === "-h") {
 
 const outIndex = args.indexOf("--out");
 const outDir = resolve(outIndex >= 0 ? args[outIndex + 1] : "eval-pack");
+const idPrefixIndex = args.indexOf("--id-prefix");
+const idPrefix = idPrefixIndex >= 0 ? args[idPrefixIndex + 1] : "";
+
+function positionalInputs(values) {
+  const inputs = [];
+  const flagsWithValues = new Set(["--out", "--id-prefix"]);
+  for (let index = 0; index < values.length; index += 1) {
+    const value = values[index];
+    if (flagsWithValues.has(value)) {
+      index += 1;
+      continue;
+    }
+    if (value.startsWith("--")) continue;
+    inputs.push(value);
+  }
+  return inputs;
+}
 
 try {
   if (command === "init") {
     mkdirSync(outDir, { recursive: true });
-    writeFileSync(join(outDir, "run-note.md"), "# Agent Run Note\n\n## Scenario\n\nDescribe the task.\n");
+    writeFileSync(join(outDir, "run-note.md"), `# Agent Run Note
+
+## Scenario
+
+Describe the task and the regression risk this note should preserve.
+
+## Inputs
+
+List prompts, files, fixtures, or commands used in the run.
+
+## Expected Behavior
+
+State what a future agent run should still do.
+
+## Forbidden Behavior
+
+State side effects, regressions, or unsafe actions the agent must avoid.
+
+## Evidence
+
+\`\`\`bash
+npm run smoke
+\`\`\`
+
+## Rubric
+
+Pass if the expected behavior is preserved and forbidden behavior is absent.
+
+## Outcome
+
+unknown
+`);
     console.log(`initialized ${outDir}`);
   } else if (command === "build") {
-    const input = args[1];
-    if (!input) throw new Error("Missing input Markdown file.");
-    const pack = buildEvalPack(input);
+    const inputValues = positionalInputs(args.slice(1));
+    if (inputValues.length === 0) throw new Error("Missing input Markdown file.");
+    const pack = buildEvalPack(inputValues, { idPrefix });
+    if (args.includes("--summary")) {
+      console.log(JSON.stringify(summarizeEvalPack(pack), null, 2));
+      process.exit(0);
+    }
     if (args.includes("--stdout")) {
       console.log(JSON.stringify(pack, null, 2));
       process.exit(0);
