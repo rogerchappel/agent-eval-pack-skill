@@ -39,3 +39,5 @@ Run `npm test`, `npm run check`, `npm run build`, `npm run smoke`, and `bash scr
 ## Limitations
 
 The parser expects structured Markdown headings. Redaction covers common token shapes but cannot guarantee removal of every sensitive value.
+
+See `docs/REDACTION.md` before sharing generated packs outside the local workspace.
