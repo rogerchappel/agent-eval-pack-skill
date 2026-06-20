@@ -9,7 +9,7 @@ function help() {
 Usage:
   agent-eval-pack init [--out dir]
   agent-eval-pack build <input.md> [--out dir]
-  agent-eval-pack validate <evals.json>`);
+  agent-eval-pack validate <evals.json> [--require-commands]`);
 }
 
 const args = process.argv.slice(2);
@@ -39,7 +39,7 @@ try {
   } else if (command === "validate") {
     const input = args[1];
     if (!input) throw new Error("Missing evals.json path.");
-    const result = validateEvalPack(input);
+    const result = validateEvalPack(input, { requireCommands: args.includes("--require-commands") });
     console.log(JSON.stringify(result, null, 2));
     process.exit(result.valid ? 0 : 1);
   } else {

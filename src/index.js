@@ -76,7 +76,7 @@ export function buildEvalPack(inputPath) {
   };
 }
 
-export function validateEvalObject(pack) {
+export function validateEvalObject(pack, options = {}) {
   const errors = [];
   if (pack.schemaVersion !== 1) errors.push("schemaVersion must be 1.");
   if (!Array.isArray(pack.cases) || pack.cases.length === 0) errors.push("cases must be a non-empty array.");
@@ -84,14 +84,17 @@ export function validateEvalObject(pack) {
     for (const key of ["id", "title", "scenario", "expectedBehavior", "forbiddenBehavior", "rubric"]) {
       if (!item[key] || typeof item[key] !== "string") errors.push(`case ${index} missing ${key}.`);
     }
+    if (options.requireCommands && (!Array.isArray(item.commands) || item.commands.length === 0)) {
+      errors.push(`case ${index} missing command evidence.`);
+    }
   }
   return { valid: errors.length === 0, errors };
 }
 
-export function validateEvalPack(inputPath) {
+export function validateEvalPack(inputPath, options = {}) {
   const path = resolve(inputPath);
   if (!existsSync(path)) return { valid: false, errors: [`File not found: ${inputPath}`] };
-  return validateEvalObject(JSON.parse(readFileSync(path, "utf8")));
+  return validateEvalObject(JSON.parse(readFileSync(path, "utf8")), options);
 }
 
 export function renderBrief(pack) {
