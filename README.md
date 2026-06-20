@@ -34,6 +34,8 @@ Use Markdown headings:
 
 Fenced shell blocks inside evidence become command evidence.
 
+See `docs/SCHEMA.md` for the generated JSON shape.
+
 ## Safety Notes
 
 The tool is local-first and performs no network calls. It redacts common token shapes and home paths, but users must review output before sharing.
