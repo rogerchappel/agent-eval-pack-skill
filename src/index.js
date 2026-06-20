@@ -9,8 +9,16 @@ const SECRET_PATTERNS = [
 ];
 
 function section(text, heading) {
-  const pattern = new RegExp(`^##\\s+${heading}\\s*$([\\s\\S]*?)(?=^##\\s+|$)`, "im");
-  return pattern.exec(text)?.[1]?.trim() ?? "";
+  const lines = text.split(/\r?\n/);
+  const wanted = heading.toLowerCase();
+  const start = lines.findIndex((line) => line.replace(/^##\s+/, "").trim().toLowerCase() === wanted);
+  if (start === -1) return "";
+  const body = [];
+  for (const line of lines.slice(start + 1)) {
+    if (/^##\s+/.test(line)) break;
+    body.push(line);
+  }
+  return body.join("\n").trim();
 }
 
 export function redact(text) {
