@@ -23,6 +23,16 @@ npm run smoke
 bash scripts/validate.sh
 ```
 
+## 2026-06-20 Local Evidence
+
+- First verification found a Markdown final-section parsing bug.
+- Parser was replaced with line-based heading extraction.
+- `npm test` passed with 9 tests after the fix.
+- `npm run check` passed syntax checks.
+- `npm run build` wrote `dist/package-check.txt`.
+- `npm run smoke` wrote `dist/smoke`.
+- `bash scripts/validate.sh` reran tests, checks, build, smoke, and JSON validation successfully.
+
 ## Known Limits
 
 - Input notes should use documented headings.
