@@ -9,7 +9,7 @@ const SECRET_PATTERNS = [
 ];
 
 function section(text, heading) {
-  const pattern = new RegExp(`^##\\s+${heading}\\s*$([\\s\\S]*?)(?=^##\\s+|\\z)`, "im");
+  const pattern = new RegExp(`^##\\s+${heading}\\s*$([\\s\\S]*?)(?=^##\\s+|$)`, "im");
   return pattern.exec(text)?.[1]?.trim() ?? "";
 }
 
