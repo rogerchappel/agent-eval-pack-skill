@@ -17,6 +17,7 @@ agent-eval-pack validate dist/smoke/evals.json
 ```bash
 agent-eval-pack init --out eval-pack
 agent-eval-pack build fixtures/success-run.md --out dist/success
+agent-eval-pack build fixtures/success-run.md --stdout
 agent-eval-pack validate dist/success/evals.json
 agent-eval-pack validate dist/success/evals.json --require-commands
 ```

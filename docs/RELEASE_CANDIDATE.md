@@ -10,6 +10,7 @@ Ship.
 - Markdown run-note parser.
 - Secret and home-path redaction.
 - JSON eval pack and Markdown brief renderers.
+- Optional stdout JSON mode for automation.
 - Fixture-backed tests and smoke workflow.
 
 ## Verification
