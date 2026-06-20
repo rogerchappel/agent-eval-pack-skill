@@ -8,7 +8,7 @@ function help() {
 
 Usage:
   agent-eval-pack init [--out dir]
-  agent-eval-pack build <input.md> [--out dir]
+  agent-eval-pack build <input.md> [--out dir] [--stdout]
   agent-eval-pack validate <evals.json> [--require-commands]`);
 }
 
@@ -32,6 +32,10 @@ try {
     const input = args[1];
     if (!input) throw new Error("Missing input Markdown file.");
     const pack = buildEvalPack(input);
+    if (args.includes("--stdout")) {
+      console.log(JSON.stringify(pack, null, 2));
+      process.exit(0);
+    }
     mkdirSync(outDir, { recursive: true });
     writeFileSync(join(outDir, "evals.json"), `${JSON.stringify(pack, null, 2)}\n`);
     writeFileSync(join(outDir, "review-brief.md"), renderBrief(pack));
