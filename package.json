@@ -1,0 +1,41 @@
+{
+  "name": "agent-eval-pack-skill",
+  "version": "0.1.0",
+  "description": "Package local agent run notes into reusable regression eval fixtures.",
+  "type": "module",
+  "bin": {
+    "agent-eval-pack": "./bin/agent-eval-pack.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check src/index.js && node --check bin/agent-eval-pack.js",
+    "build": "node scripts/build.js",
+    "smoke": "node bin/agent-eval-pack.js build fixtures/success-run.md --out dist/smoke"
+  },
+  "keywords": [
+    "agent-evals",
+    "prompt-regression",
+    "agent-skills",
+    "cli"
+  ],
+  "author": "Roger Chappel",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rogerchappel/agent-eval-pack-skill.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rogerchappel/agent-eval-pack-skill/issues"
+  },
+  "homepage": "https://github.com/rogerchappel/agent-eval-pack-skill#readme",
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "bin",
+    "src",
+    "docs",
+    "SKILL.md",
+    "README.md"
+  ]
+}
