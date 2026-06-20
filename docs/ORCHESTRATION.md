@@ -9,3 +9,5 @@ Use this tool after an agent run produces useful evidence or an instructive fail
 5. Commit only sanitized fixtures that are safe to share.
 
 The tool performs local reads and writes only. It does not execute model evals, call external APIs, or upload artifacts.
+
+For command-sensitive regressions, validate with `--require-commands` before committing the pack.

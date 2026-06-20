@@ -18,6 +18,7 @@ agent-eval-pack validate dist/smoke/evals.json
 agent-eval-pack init --out eval-pack
 agent-eval-pack build fixtures/success-run.md --out dist/success
 agent-eval-pack validate dist/success/evals.json
+agent-eval-pack validate dist/success/evals.json --require-commands
 ```
 
 ## Run Note Format
@@ -35,6 +36,8 @@ Use Markdown headings:
 Fenced shell blocks inside evidence become command evidence.
 
 See `docs/SCHEMA.md` for the generated JSON shape.
+
+Use `--require-commands` when a regression case must include executable evidence.
 
 ## Safety Notes
 
