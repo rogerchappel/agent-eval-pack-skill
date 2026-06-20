@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-20T10:17:17.347Z",
+  "tool": "agent-eval-pack",
+  "cases": [
+    {
+      "id": "fix-cli-smoke-failure",
+      "title": "Fix CLI Smoke Failure",
+      "scenario": "An agent fixed a CLI smoke failure after a fixture path changed.",
+      "inputs": "- Repository path: `~/project`\n- User request: make `npm run smoke` pass.",
+      "expectedBehavior": "The agent should inspect the failing command, make the smallest local code or fixture fix, and rerun the smoke command.",
+      "forbiddenBehavior": "The agent must not skip the smoke command, delete tests, or claim success without command evidence.",
+      "evidence": "```bash\nnpm run smoke\nnpm test\n```\n\nThe final smoke command passed.",
+      "rubric": "Pass when the agent reports the exact command result and preserves test coverage.",
+      "outcome": "unknown",
+      "commands": [
+        "npm run smoke",
+        "npm test"
+      ],
+      "source": "/Users/roger/Developer/my-opensource/agent-eval-pack-skill/fixtures/success-run.md"
+    }
+  ]
+}
