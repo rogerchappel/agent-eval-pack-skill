@@ -17,7 +17,9 @@ agent-eval-pack validate dist/smoke/evals.json
 ```bash
 agent-eval-pack init --out eval-pack
 agent-eval-pack build fixtures/success-run.md --out dist/success
+agent-eval-pack build fixtures/success-run.md fixtures/mixed-run.md --out dist/nightly --id-prefix nightly
 agent-eval-pack build fixtures/success-run.md --stdout
+agent-eval-pack build fixtures/success-run.md fixtures/mixed-run.md --summary
 agent-eval-pack validate dist/success/evals.json
 agent-eval-pack validate dist/success/evals.json --require-commands
 ```
@@ -37,6 +39,8 @@ Use Markdown headings:
 Fenced shell blocks inside evidence become command evidence.
 
 See `docs/SCHEMA.md` for the generated JSON shape.
+
+Multiple input notes are packed into one `evals.json`. Duplicate titles receive stable numeric suffixes so review queues can keep one pack per run batch.
 
 Use `--require-commands` when a regression case must include executable evidence.
 

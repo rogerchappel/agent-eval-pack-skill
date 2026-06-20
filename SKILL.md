@@ -21,14 +21,16 @@ The workflow reads local Markdown and writes local JSON/Markdown output. Do not 
 ## Workflow
 
 1. Create or inspect the run note.
-2. Run `agent-eval-pack build <input.md> --out <dir>`.
+2. Run `agent-eval-pack build <input.md...> --out <dir>`.
 3. Run `agent-eval-pack validate <dir>/evals.json`.
 4. Review `review-brief.md` for missing scenario, expected behavior, forbidden behavior, or rubric.
+5. For batch review queues, run `agent-eval-pack build <input.md...> --summary` and compare case/outcome counts before sharing.
 
 ## Examples
 
 ```bash
 agent-eval-pack build fixtures/success-run.md --out dist/success
+agent-eval-pack build fixtures/success-run.md fixtures/mixed-run.md --out dist/nightly --id-prefix nightly
 agent-eval-pack validate dist/success/evals.json
 ```
 
