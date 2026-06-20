@@ -21,6 +21,11 @@ test("validates required eval fields", () => {
   assert.equal(validateEvalObject({ schemaVersion: 1, cases: [{}] }).valid, false);
 });
 
+test("can require command evidence", () => {
+  const pack = buildEvalPack("fixtures/failure-run.md");
+  assert.equal(validateEvalObject(pack, { requireCommands: true }).valid, false);
+});
+
 test("renders a reviewer brief", () => {
   const pack = buildEvalPack("fixtures/success-run.md");
   assert.match(renderBrief(pack), /Expected Behavior/);
