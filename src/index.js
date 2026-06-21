@@ -67,16 +67,35 @@ export function parseRunNote(inputPath) {
   };
 }
 
-export function buildEvalPack(inputPath) {
-  const note = parseRunNote(inputPath);
-  const now = new Date().toISOString();
+function slugify(value, fallback = "agent-run-case") {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || fallback;
+}
+
+function uniqueId(base, seen) {
+  let candidate = base;
+  let index = 2;
+  while (seen.has(candidate)) {
+    candidate = `${base}-${index}`;
+    index += 1;
+  }
+  seen.add(candidate);
+  return candidate;
+}
+
+export function buildEvalPack(inputPath, options = {}) {
+  const inputPaths = Array.isArray(inputPath) ? inputPath : [inputPath];
+  if (inputPaths.length === 0) throw new Error("At least one input Markdown file is required.");
+  const notes = inputPaths.map((path) => parseRunNote(path));
+  const seenIds = new Set();
+  const now = options.generatedAt ?? new Date().toISOString();
   return {
     schemaVersion: 1,
     generatedAt: now,
     tool: "agent-eval-pack",
-    cases: [
-      {
-        id: note.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "agent-run-case",
+    cases: notes.map((note) => {
+      const idBase = [options.idPrefix, slugify(note.title)].filter(Boolean).join("-");
+      return {
+        id: uniqueId(idBase || "agent-run-case", seenIds),
         title: note.title,
         scenario: note.scenario,
         inputs: note.inputs,
@@ -87,8 +106,8 @@ export function buildEvalPack(inputPath) {
         outcome: note.outcome || "unknown",
         commands: note.commands,
         source: note.source
-      }
-    ]
+      };
+    })
   };
 }
 
@@ -96,10 +115,13 @@ export function validateEvalObject(pack, options = {}) {
   const errors = [];
   if (pack.schemaVersion !== 1) errors.push("schemaVersion must be 1.");
   if (!Array.isArray(pack.cases) || pack.cases.length === 0) errors.push("cases must be a non-empty array.");
+  const ids = new Set();
   for (const [index, item] of (pack.cases ?? []).entries()) {
     for (const key of ["id", "title", "scenario", "expectedBehavior", "forbiddenBehavior", "rubric"]) {
       if (!item[key] || typeof item[key] !== "string") errors.push(`case ${index} missing ${key}.`);
     }
+    if (item.id && ids.has(item.id)) errors.push(`case ${index} duplicates id ${item.id}.`);
+    if (item.id) ids.add(item.id);
     if (options.requireCommands && (!Array.isArray(item.commands) || item.commands.length === 0)) {
       errors.push(`case ${index} missing command evidence.`);
     }
@@ -135,4 +157,21 @@ export function renderBrief(pack) {
     lines.push("");
   }
   return `${lines.join("\n")}\n`;
+}
+
+export function summarizeEvalPack(pack) {
+  const outcomeCounts = {};
+  let commandCount = 0;
+  for (const item of pack.cases) {
+    const outcome = item.outcome || "unknown";
+    outcomeCounts[outcome] = (outcomeCounts[outcome] ?? 0) + 1;
+    commandCount += Array.isArray(item.commands) ? item.commands.length : 0;
+  }
+  return {
+    schemaVersion: pack.schemaVersion,
+    generatedAt: pack.generatedAt,
+    caseCount: pack.cases.length,
+    commandCount,
+    outcomeCounts
+  };
 }

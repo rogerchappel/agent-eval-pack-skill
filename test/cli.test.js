@@ -34,3 +34,24 @@ test("cli can print JSON to stdout", () => {
   assert.equal(result.status, 0);
   assert.equal(JSON.parse(result.stdout).tool, "agent-eval-pack");
 });
+
+test("cli can print multi-file summaries", () => {
+  const result = spawnSync(
+    "node",
+    [
+      "bin/agent-eval-pack.js",
+      "build",
+      "fixtures/success-run.md",
+      "fixtures/mixed-run.md",
+      "--summary",
+      "--id-prefix",
+      "nightly"
+    ],
+    { encoding: "utf8" }
+  );
+  assert.equal(result.status, 0);
+  const summary = JSON.parse(result.stdout);
+  assert.equal(summary.caseCount, 2);
+  assert.equal(summary.outcomeCounts.success, 1);
+  assert.equal(summary.outcomeCounts.mixed, 1);
+});
