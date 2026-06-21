@@ -8,6 +8,11 @@ const SECRET_PATTERNS = [
   /AKIA[0-9A-Z]{16}/g
 ];
 
+const HOME_PATH_PATTERNS = [
+  /\/Users\/[A-Za-z0-9._-]+/g,
+  /\/home\/[A-Za-z0-9._-]+/g
+];
+
 function section(text, heading) {
   const lines = text.split(/\r?\n/);
   const wanted = heading.toLowerCase();
@@ -23,6 +28,9 @@ function section(text, heading) {
 
 export function redact(text) {
   let output = text.replaceAll(process.env.HOME ?? "", "~");
+  for (const pattern of HOME_PATH_PATTERNS) {
+    output = output.replace(pattern, "~");
+  }
   for (const pattern of SECRET_PATTERNS) {
     output = output.replace(pattern, "[REDACTED_SECRET]");
   }
