@@ -8,6 +8,7 @@ The CLI extracts scenario, inputs, expected behavior, forbidden behavior, eviden
 
 ```bash
 npm install
+npm run release:check
 npm run smoke
 agent-eval-pack validate dist/smoke/evals.json
 ```
@@ -47,6 +48,17 @@ Use `--require-commands` when a regression case must include executable evidence
 ## Safety Notes
 
 The tool is local-first and performs no network calls. It redacts common token shapes and home paths, but users must review output before sharing.
+
+## Release Checks
+
+Run the full local gate before opening a release PR:
+
+```bash
+npm run release:check
+```
+
+The gate runs syntax checks, tests, the build step, the fixture-backed smoke
+command, and `npm pack --dry-run`.
 
 ## Limitations
 
