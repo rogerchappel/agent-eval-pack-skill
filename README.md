@@ -63,3 +63,12 @@ command, and `npm pack --dry-run`.
 ## Limitations
 
 This package prepares eval fixtures. It does not run model evals, grade agents, read live chat systems, or upload artifacts.
+
+## Local Verification
+
+Run the committed test suite before publishing changes:
+
+```sh
+npm test
+```
+
