@@ -60,6 +60,19 @@ npm run release:check
 The gate runs syntax checks, tests, the build step, the fixture-backed smoke
 command, and `npm pack --dry-run`.
 
+
+## Verification
+
+Run the local quality gates before opening a pull request:
+
+```sh
+npm run lint
+npm test
+npm run smoke
+```
+
+`npm run lint` is an alias for the repository static check so contributors can use the common npm workflow without guessing the project-specific command.
+
 ## Limitations
 
 This package prepares eval fixtures. It does not run model evals, grade agents, read live chat systems, or upload artifacts.
