@@ -39,6 +39,13 @@ bash scripts/validate.sh
 - Added optional `Risk Level` and `Tags` run-note sections.
 - Summary output now includes risk and tag counts for batch review.
 - Verification reran tests, checks, build, smoke, and validation successfully.
+- Added `Risk Level` and `Tags` to the `agent-eval-pack init` template so new fixtures include review triage metadata by default.
+- `bash scripts/validate.sh` passed:
+  - `npm test` passed, 14 tests
+  - `npm run check` passed syntax checks
+  - `npm run build` wrote `dist/package-check.txt`
+  - `npm run smoke` wrote `dist/smoke`
+  - smoke output validation returned `{ "valid": true, "errors": [] }`
 
 ## Known Limits
 

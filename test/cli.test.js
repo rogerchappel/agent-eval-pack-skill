@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { existsSync, rmSync } from "node:fs";
+import { existsSync, readFileSync, rmSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import test from "node:test";
 
@@ -17,6 +17,18 @@ test("cli builds and validates a pack", () => {
     encoding: "utf8"
   });
   assert.equal(validate.status, 0);
+});
+
+test("init template includes review triage fields", () => {
+  const out = "/tmp/agent-eval-pack-init-test";
+  rmSync(out, { force: true, recursive: true });
+  const init = spawnSync("node", ["bin/agent-eval-pack.js", "init", "--out", out], {
+    encoding: "utf8"
+  });
+  assert.equal(init.status, 0);
+  const template = readFileSync(`${out}/run-note.md`, "utf8");
+  assert.match(template, /## Risk Level/);
+  assert.match(template, /## Tags/);
 });
 
 test("cli reports missing input", () => {

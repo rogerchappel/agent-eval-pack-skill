@@ -71,6 +71,15 @@ npm run smoke
 
 Pass if the expected behavior is preserved and forbidden behavior is absent.
 
+## Risk Level
+
+medium
+
+## Tags
+
+- regression
+- local-first
+
 ## Outcome
 
 unknown
