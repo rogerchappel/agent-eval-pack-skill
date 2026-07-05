@@ -62,6 +62,8 @@ export function parseRunNote(inputPath) {
     forbiddenBehavior: section(redacted, "Forbidden Behavior"),
     evidence: section(redacted, "Evidence"),
     rubric: section(redacted, "Rubric"),
+    riskLevel: section(redacted, "Risk Level"),
+    tags: parseTags(section(redacted, "Tags")),
     outcome: section(redacted, "Outcome"),
     commands: extractCommands(redacted)
   };
@@ -69,6 +71,13 @@ export function parseRunNote(inputPath) {
 
 function slugify(value, fallback = "agent-run-case") {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || fallback;
+}
+
+function parseTags(value) {
+  return value
+    .split(/,|\n/)
+    .map((item) => item.trim().replace(/^-+\s*/, ""))
+    .filter(Boolean);
 }
 
 function uniqueId(base, seen) {
@@ -103,6 +112,8 @@ export function buildEvalPack(inputPath, options = {}) {
         forbiddenBehavior: note.forbiddenBehavior,
         evidence: note.evidence,
         rubric: note.rubric || "Pass if the agent preserves the expected behavior and avoids forbidden behavior.",
+        riskLevel: note.riskLevel || "unspecified",
+        tags: note.tags,
         outcome: note.outcome || "unknown",
         commands: note.commands,
         source: note.source
@@ -125,6 +136,7 @@ export function validateEvalObject(pack, options = {}) {
     if (options.requireCommands && (!Array.isArray(item.commands) || item.commands.length === 0)) {
       errors.push(`case ${index} missing command evidence.`);
     }
+    if (item.tags && !Array.isArray(item.tags)) errors.push(`case ${index} tags must be an array.`);
   }
   return { valid: errors.length === 0, errors };
 }
@@ -142,6 +154,8 @@ export function renderBrief(pack) {
     lines.push("");
     lines.push(`ID: ${item.id}`);
     lines.push(`Outcome: ${item.outcome}`);
+    lines.push(`Risk Level: ${item.riskLevel || "unspecified"}`);
+    if (Array.isArray(item.tags) && item.tags.length > 0) lines.push(`Tags: ${item.tags.join(", ")}`);
     lines.push("");
     lines.push("### Scenario");
     lines.push(item.scenario || "Not provided.");
@@ -161,10 +175,17 @@ export function renderBrief(pack) {
 
 export function summarizeEvalPack(pack) {
   const outcomeCounts = {};
+  const riskCounts = {};
+  const tagCounts = {};
   let commandCount = 0;
   for (const item of pack.cases) {
     const outcome = item.outcome || "unknown";
     outcomeCounts[outcome] = (outcomeCounts[outcome] ?? 0) + 1;
+    const risk = item.riskLevel || "unspecified";
+    riskCounts[risk] = (riskCounts[risk] ?? 0) + 1;
+    for (const tag of item.tags ?? []) {
+      tagCounts[tag] = (tagCounts[tag] ?? 0) + 1;
+    }
     commandCount += Array.isArray(item.commands) ? item.commands.length : 0;
   }
   return {
@@ -172,6 +193,8 @@ export function summarizeEvalPack(pack) {
     generatedAt: pack.generatedAt,
     caseCount: pack.cases.length,
     commandCount,
-    outcomeCounts
+    outcomeCounts,
+    riskCounts,
+    tagCounts
   };
 }

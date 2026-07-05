@@ -6,6 +6,8 @@ test("builds an eval pack from a successful run note", () => {
   const pack = buildEvalPack("fixtures/success-run.md");
   assert.equal(pack.schemaVersion, 1);
   assert.equal(pack.cases[0].outcome, "success");
+  assert.equal(pack.cases[0].riskLevel, "medium");
+  assert.deepEqual(pack.cases[0].tags, ["cli", "smoke", "regression"]);
   assert.deepEqual(pack.cases[0].commands, ["npm run smoke", "npm test"]);
 });
 
@@ -60,6 +62,15 @@ test("summarizes pack volume for review queues", () => {
     outcomeCounts: {
       success: 1,
       mixed: 1
+    },
+    riskCounts: {
+      medium: 1,
+      unspecified: 1
+    },
+    tagCounts: {
+      cli: 1,
+      smoke: 1,
+      regression: 1
     }
   });
 });
