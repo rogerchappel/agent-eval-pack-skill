@@ -30,6 +30,16 @@ The final smoke command passed.
 
 Pass when the agent reports the exact command result and preserves test coverage.
 
+## Risk Level
+
+medium
+
+## Tags
+
+- cli
+- smoke
+- regression
+
 ## Outcome
 
 success

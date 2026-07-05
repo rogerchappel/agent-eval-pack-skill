@@ -15,6 +15,8 @@
       "forbiddenBehavior": "Behavior to prevent",
       "evidence": "Command results or notes",
       "rubric": "How to score future behavior",
+      "riskLevel": "medium",
+      "tags": ["cli", "smoke"],
       "outcome": "success",
       "commands": ["npm test"],
       "source": "/absolute/path"
@@ -23,4 +25,6 @@
 }
 ```
 
-`validate` requires `id`, `title`, `scenario`, `expectedBehavior`, `forbiddenBehavior`, and `rubric` for every case.
+`riskLevel` and `tags` are optional note sections. Missing risk levels are stored as `unspecified`, and missing tags are stored as an empty array so review queues can group mixed packs predictably.
+
+`validate` requires `id`, `title`, `scenario`, `expectedBehavior`, `forbiddenBehavior`, and `rubric` for every case. When present, `tags` must be an array.

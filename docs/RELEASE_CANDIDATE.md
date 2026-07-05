@@ -10,6 +10,7 @@ Ship.
 - Markdown run-note parser.
 - Secret and home-path redaction.
 - JSON eval pack and Markdown brief renderers.
+- Risk level and tag fields for review queue triage.
 - Optional stdout JSON mode for automation.
 - Fixture-backed tests and smoke workflow.
 
@@ -32,6 +33,12 @@ bash scripts/validate.sh
 - `npm run build` wrote `dist/package-check.txt`.
 - `npm run smoke` wrote `dist/smoke`.
 - `bash scripts/validate.sh` reran tests, checks, build, smoke, and JSON validation successfully.
+
+## 2026-07-05 Local Evidence
+
+- Added optional `Risk Level` and `Tags` run-note sections.
+- Summary output now includes risk and tag counts for batch review.
+- Verification reran tests, checks, build, smoke, and validation successfully.
 
 ## Known Limits
 
