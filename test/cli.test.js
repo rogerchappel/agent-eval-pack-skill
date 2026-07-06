@@ -39,6 +39,17 @@ test("cli reports missing input", () => {
   assert.match(result.stderr, /Missing input/);
 });
 
+test("cli help documents build, init, and validate commands", () => {
+  const result = spawnSync("node", ["bin/agent-eval-pack.js", "--help"], {
+    encoding: "utf8"
+  });
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /Usage:/);
+  assert.match(result.stdout, /agent-eval-pack build/);
+  assert.match(result.stdout, /agent-eval-pack init/);
+  assert.match(result.stdout, /agent-eval-pack validate/);
+});
+
 test("cli can print JSON to stdout", () => {
   const result = spawnSync("node", ["bin/agent-eval-pack.js", "build", "fixtures/success-run.md", "--stdout"], {
     encoding: "utf8"
