@@ -11,7 +11,7 @@
     "check": "node --check src/index.js && node --check bin/agent-eval-pack.js",
     "lint": "node --check src/index.js && node --check bin/agent-eval-pack.js",
     "test": "node --test",
-    "smoke": "node bin/agent-eval-pack.js build fixtures/success-run.md --out dist/smoke",
+    "smoke": "node bin/agent-eval-pack.js --help >/dev/null && node bin/agent-eval-pack.js build fixtures/success-run.md --out dist/smoke",
     "package:smoke": "node scripts/package-smoke.mjs",
     "release:check": "npm run check && npm test && npm run build && npm run smoke && npm run package:smoke"
   },
