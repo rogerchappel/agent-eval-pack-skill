@@ -27,7 +27,8 @@ function section(text, heading) {
 }
 
 export function redact(text) {
-  let output = text.replaceAll(process.env.HOME ?? "", "~");
+  const home = process.env.HOME;
+  let output = home ? text.replaceAll(home, "~") : text;
   for (const pattern of HOME_PATH_PATTERNS) {
     output = output.replace(pattern, "~");
   }
