@@ -25,6 +25,9 @@ agent-eval-pack validate dist/success/evals.json
 agent-eval-pack validate dist/success/evals.json --require-commands
 ```
 
+`--out` and `--id-prefix` require a value. If either value is omitted, the CLI
+prints a concise error and the usage guide without a stack trace.
+
 ## Run Note Format
 
 Use Markdown headings:
@@ -47,7 +50,10 @@ Use `--require-commands` when a regression case must include executable evidence
 
 ## Safety Notes
 
-The tool is local-first and performs no network calls. It redacts common token shapes and home paths, but users must review output before sharing.
+The tool is local-first and performs no network calls. It redacts common token
+shapes and home paths, including a configured `HOME` path. If `HOME` is unset or
+empty, ordinary text is left unchanged. Users must still review output before
+sharing.
 
 ## Release Checks
 
@@ -84,4 +90,3 @@ Run the committed test suite before publishing changes:
 ```sh
 npm test
 ```
-

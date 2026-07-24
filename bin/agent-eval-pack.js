@@ -3,13 +3,16 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { buildEvalPack, renderBrief, summarizeEvalPack, validateEvalPack } from "../src/index.js";
 
-function help() {
-  console.log(`agent-eval-pack
+const USAGE = `agent-eval-pack
 
 Usage:
   agent-eval-pack init [--out dir]
   agent-eval-pack build <input.md...> [--out dir] [--stdout] [--summary] [--id-prefix text]
-  agent-eval-pack validate <evals.json> [--require-commands]`);
+  agent-eval-pack validate <evals.json> [--require-commands]
+`;
+
+function help(stream = process.stdout) {
+  stream.write(USAGE);
 }
 
 const args = process.argv.slice(2);
@@ -20,10 +23,13 @@ if (!command || command === "--help" || command === "-h") {
   process.exit(0);
 }
 
-const outIndex = args.indexOf("--out");
-const outDir = resolve(outIndex >= 0 ? args[outIndex + 1] : "eval-pack");
-const idPrefixIndex = args.indexOf("--id-prefix");
-const idPrefix = idPrefixIndex >= 0 ? args[idPrefixIndex + 1] : "";
+function optionValue(values, flag, fallback) {
+  const index = values.indexOf(flag);
+  if (index === -1) return fallback;
+  const value = values[index + 1];
+  if (!value || value.startsWith("--")) throw new Error(`Missing value for ${flag}.`);
+  return value;
+}
 
 function positionalInputs(values) {
   const inputs = [];
@@ -41,6 +47,9 @@ function positionalInputs(values) {
 }
 
 try {
+  const outDir = resolve(optionValue(args, "--out", "eval-pack"));
+  const idPrefix = optionValue(args, "--id-prefix", "");
+
   if (command === "init") {
     mkdirSync(outDir, { recursive: true });
     writeFileSync(join(outDir, "run-note.md"), `# Agent Run Note
@@ -112,5 +121,6 @@ unknown
   }
 } catch (error) {
   console.error(error.message);
+  help(process.stderr);
   process.exit(1);
 }

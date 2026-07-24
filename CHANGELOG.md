@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Preserve input when `HOME` is unavailable and report missing CLI option values
+  with controlled usage diagnostics.
 - Add release-readiness checks for package metadata, pack contents, and CI verification.
 All notable changes to this project will be recorded here.
 

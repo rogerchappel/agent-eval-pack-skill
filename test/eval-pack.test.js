@@ -37,6 +37,30 @@ test("redact handles common secret shapes", () => {
   assert.equal(redact("sk-abc123 token"), "[REDACTED_SECRET] token");
 });
 
+test("redact preserves ordinary text without a configured HOME", () => {
+  const originalHome = process.env.HOME;
+  try {
+    delete process.env.HOME;
+    assert.equal(redact("plain text"), "plain text");
+    process.env.HOME = "";
+    assert.equal(redact("plain text"), "plain text");
+  } finally {
+    if (originalHome === undefined) delete process.env.HOME;
+    else process.env.HOME = originalHome;
+  }
+});
+
+test("redact replaces the configured home path on any platform", () => {
+  const originalHome = process.env.HOME;
+  try {
+    process.env.HOME = "/custom/profile";
+    assert.equal(redact("read /custom/profile/project/file.md"), "read ~/project/file.md");
+  } finally {
+    if (originalHome === undefined) delete process.env.HOME;
+    else process.env.HOME = originalHome;
+  }
+});
+
 test("builds multi-case packs with unique ids", () => {
   const pack = buildEvalPack(["fixtures/success-run.md", "fixtures/success-run.md"], {
     generatedAt: "2026-06-20T00:00:00.000Z",
