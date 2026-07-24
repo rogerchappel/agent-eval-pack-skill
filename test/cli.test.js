@@ -39,6 +39,18 @@ test("cli reports missing input", () => {
   assert.match(result.stderr, /Missing input/);
 });
 
+for (const flag of ["--out", "--id-prefix"]) {
+  test(`cli reports a missing value for ${flag} without a stack trace`, () => {
+    const result = spawnSync("node", ["bin/agent-eval-pack.js", "build", "fixtures/success-run.md", flag], {
+      encoding: "utf8"
+    });
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, new RegExp(`Missing value for ${flag}`));
+    assert.match(result.stderr, /Usage:/);
+    assert.doesNotMatch(result.stderr, /\n\s+at |ERR_INVALID_ARG_TYPE|TypeError/);
+  });
+}
+
 test("cli help documents build, init, and validate commands", () => {
   const result = spawnSync("node", ["bin/agent-eval-pack.js", "--help"], {
     encoding: "utf8"
