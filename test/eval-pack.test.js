@@ -1,6 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildEvalPack, parseRunNote, redact, renderBrief, summarizeEvalPack, validateEvalObject } from "../src/index.js";
+import {
+  buildEvalPack,
+  parseRunNote,
+  portableSource,
+  redact,
+  renderBrief,
+  summarizeEvalPack,
+  validateEvalObject
+} from "../src/index.js";
 
 test("builds an eval pack from a successful run note", () => {
   const pack = buildEvalPack("fixtures/success-run.md");
@@ -15,6 +23,16 @@ test("redacts tokens and home paths", () => {
   const note = parseRunNote("fixtures/failure-run.md");
   assert.match(note.inputs, /\[REDACTED_SECRET\]/);
   assert.doesNotMatch(note.inputs, /\/Users\/roger/);
+});
+
+test("uses portable source metadata for absolute POSIX paths", () => {
+  const pack = buildEvalPack(`${process.cwd()}/fixtures/success-run.md`);
+  assert.equal(pack.cases[0].source, "fixtures/success-run.md");
+  assert.doesNotMatch(pack.cases[0].source, /^\/|\/private\/tmp|\/Users\//);
+});
+
+test("reduces absolute Windows paths to a portable source name", () => {
+  assert.equal(portableSource("C:\\Users\\roger\\runs\\success-run.md"), "success-run.md");
 });
 
 test("validates required eval fields", () => {

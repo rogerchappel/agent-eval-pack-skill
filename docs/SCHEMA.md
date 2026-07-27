@@ -19,7 +19,7 @@
       "tags": ["cli", "smoke"],
       "outcome": "success",
       "commands": ["npm test"],
-      "source": "/absolute/path"
+      "source": "fixtures/success-run.md"
     }
   ]
 }
