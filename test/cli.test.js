@@ -51,6 +51,20 @@ for (const flag of ["--out", "--id-prefix"]) {
   });
 }
 
+for (const [name, cliArgs, message] of [
+  ["unknown build options", ["build", "fixtures/success-run.md", "--typo"], /Unknown option: --typo/],
+  ["build-only options on init", ["init", "--stdout"], /Unknown option: --stdout/],
+  ["build-only options on validate", ["validate", "one.json", "--out", "pack"], /Unknown option: --out/],
+  ["stray init values", ["init", "unexpected"], /Unexpected argument: unexpected/],
+  ["stray validate values", ["validate", "one.json", "two.json"], /Unexpected argument: two.json/]
+]) {
+  test(`cli rejects ${name}`, () => {
+    const result = spawnSync("node", ["bin/agent-eval-pack.js", ...cliArgs], { encoding: "utf8" });
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, message);
+  });
+}
+
 test("cli help documents build, init, and validate commands", () => {
   const result = spawnSync("node", ["bin/agent-eval-pack.js", "--help"], {
     encoding: "utf8"

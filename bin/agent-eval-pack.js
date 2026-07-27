@@ -23,34 +23,34 @@ if (!command || command === "--help" || command === "-h") {
   process.exit(0);
 }
 
-function optionValue(values, flag, fallback) {
-  const index = values.indexOf(flag);
-  if (index === -1) return fallback;
-  const value = values[index + 1];
-  if (!value || value.startsWith("--")) throw new Error(`Missing value for ${flag}.`);
-  return value;
-}
-
-function positionalInputs(values) {
-  const inputs = [];
-  const flagsWithValues = new Set(["--out", "--id-prefix"]);
+function parseOptions(values, definitions) {
+  const options = {};
+  const positionals = [];
   for (let index = 0; index < values.length; index += 1) {
     const value = values[index];
-    if (flagsWithValues.has(value)) {
-      index += 1;
+    if (!value.startsWith("-")) {
+      positionals.push(value);
       continue;
     }
-    if (value.startsWith("--")) continue;
-    inputs.push(value);
+    const kind = definitions[value];
+    if (!kind) throw new Error(`Unknown option: ${value}`);
+    if (kind === "value") {
+      const optionValue = values[index + 1];
+      if (!optionValue || optionValue.startsWith("-")) throw new Error(`Missing value for ${value}.`);
+      options[value] = optionValue;
+      index += 1;
+    } else {
+      options[value] = true;
+    }
   }
-  return inputs;
+  return { options, positionals };
 }
 
 try {
-  const outDir = resolve(optionValue(args, "--out", "eval-pack"));
-  const idPrefix = optionValue(args, "--id-prefix", "");
-
   if (command === "init") {
+    const { options, positionals } = parseOptions(args.slice(1), { "--out": "value" });
+    if (positionals.length > 0) throw new Error(`Unexpected argument: ${positionals[0]}`);
+    const outDir = resolve(options["--out"] ?? "eval-pack");
     mkdirSync(outDir, { recursive: true });
     writeFileSync(join(outDir, "run-note.md"), `# Agent Run Note
 
@@ -95,25 +95,33 @@ unknown
 `);
     console.log(`initialized ${outDir}`);
   } else if (command === "build") {
-    const inputValues = positionalInputs(args.slice(1));
+    const { options, positionals: inputValues } = parseOptions(args.slice(1), {
+      "--out": "value",
+      "--stdout": "boolean",
+      "--summary": "boolean",
+      "--id-prefix": "value"
+    });
     if (inputValues.length === 0) throw new Error("Missing input Markdown file.");
-    const pack = buildEvalPack(inputValues, { idPrefix });
-    if (args.includes("--summary")) {
+    const pack = buildEvalPack(inputValues, { idPrefix: options["--id-prefix"] ?? "" });
+    if (options["--summary"]) {
       console.log(JSON.stringify(summarizeEvalPack(pack), null, 2));
       process.exit(0);
     }
-    if (args.includes("--stdout")) {
+    if (options["--stdout"]) {
       console.log(JSON.stringify(pack, null, 2));
       process.exit(0);
     }
+    const outDir = resolve(options["--out"] ?? "eval-pack");
     mkdirSync(outDir, { recursive: true });
     writeFileSync(join(outDir, "evals.json"), `${JSON.stringify(pack, null, 2)}\n`);
     writeFileSync(join(outDir, "review-brief.md"), renderBrief(pack));
     console.log(`wrote ${outDir}`);
   } else if (command === "validate") {
-    const input = args[1];
+    const { options, positionals } = parseOptions(args.slice(1), { "--require-commands": "boolean" });
+    const input = positionals[0];
     if (!input) throw new Error("Missing evals.json path.");
-    const result = validateEvalPack(input, { requireCommands: args.includes("--require-commands") });
+    if (positionals.length > 1) throw new Error(`Unexpected argument: ${positionals[1]}`);
+    const result = validateEvalPack(input, { requireCommands: options["--require-commands"] });
     console.log(JSON.stringify(result, null, 2));
     process.exit(result.valid ? 0 : 1);
   } else {
