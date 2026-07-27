@@ -17,7 +17,7 @@
         "npm run smoke",
         "npm test"
       ],
-      "source": "/Users/roger/Developer/my-opensource/agent-eval-pack-skill/fixtures/success-run.md"
+      "source": "fixtures/success-run.md"
     }
   ]
 }

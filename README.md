@@ -27,6 +27,7 @@ agent-eval-pack validate dist/success/evals.json --require-commands
 
 `--out` and `--id-prefix` require a value. If either value is omitted, the CLI
 prints a concise error and the usage guide without a stack trace.
+Unknown options and stray command arguments are rejected with a nonzero exit.
 
 ## Run Note Format
 
@@ -54,6 +55,11 @@ The tool is local-first and performs no network calls. It redacts common token
 shapes and home paths, including a configured `HOME` path. If `HOME` is unset or
 empty, ordinary text is left unchanged. Users must still review output before
 sharing.
+
+Each generated case's `source` is a portable identifier, never an absolute
+checkout, home, or temporary path. Inputs inside the caller's working directory
+use a normalized caller-relative path; inputs outside it and Windows absolute
+paths use the filename.
 
 ## Release Checks
 
