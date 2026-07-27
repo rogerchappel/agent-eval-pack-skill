@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
-import { basename, resolve } from "node:path";
+import { basename, isAbsolute, relative, resolve, win32 } from "node:path";
 
 const SECRET_PATTERNS = [
   /gho_[A-Za-z0-9_]+/g,
@@ -49,13 +49,23 @@ export function extractCommands(text) {
   return commands;
 }
 
+export function portableSource(inputPath, cwd = process.cwd()) {
+  if (isAbsolute(inputPath)) {
+    const callerRelative = relative(cwd, inputPath).replaceAll("\\", "/");
+    return callerRelative && !callerRelative.startsWith("../") ? callerRelative : basename(inputPath);
+  }
+  if (win32.isAbsolute(inputPath)) return win32.basename(inputPath);
+  const callerRelative = inputPath.replaceAll("\\", "/").replace(/^\.\//, "");
+  return callerRelative.startsWith("../") ? basename(callerRelative) : callerRelative;
+}
+
 export function parseRunNote(inputPath) {
   const path = resolve(inputPath);
   if (!existsSync(path)) throw new Error(`Input not found: ${inputPath}`);
   const raw = readFileSync(path, "utf8");
   const redacted = redact(raw);
   return {
-    source: path,
+    source: portableSource(inputPath),
     title: /^#\s+(.+)$/m.exec(redacted)?.[1]?.trim() ?? basename(path),
     scenario: section(redacted, "Scenario"),
     inputs: section(redacted, "Inputs"),
