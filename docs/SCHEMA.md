@@ -28,3 +28,8 @@
 `riskLevel` and `tags` are optional note sections. Missing risk levels are stored as `unspecified`, and missing tags are stored as an empty array so review queues can group mixed packs predictably.
 
 `validate` requires `id`, `title`, `scenario`, `expectedBehavior`, `forbiddenBehavior`, and `rubric` for every case. When present, `tags` must be an array.
+
+`commands` contains non-comment lines from fenced shell blocks within the
+`## Evidence` section only. Fenced blocks in other note sections do not populate
+this field. `validate --require-commands` requires this array to contain at least
+one Evidence command for every case.
