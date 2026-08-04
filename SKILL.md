@@ -22,7 +22,9 @@ The workflow reads local Markdown and writes local JSON/Markdown output. Do not 
 
 1. Create or inspect the run note.
 2. Run `agent-eval-pack build <input.md...> --out <dir>`.
-3. Run `agent-eval-pack validate <dir>/evals.json`.
+3. Run `agent-eval-pack validate <dir>/evals.json`. Add `--require-commands` when
+   every case must contain a fenced shell command in its `## Evidence` section;
+   fenced blocks in other sections do not count.
 4. Review `review-brief.md` for missing scenario, expected behavior, forbidden behavior, or rubric.
 5. For batch review queues, run `agent-eval-pack build <input.md...> --summary` and compare case/outcome counts before sharing.
 

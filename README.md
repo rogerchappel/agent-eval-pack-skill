@@ -41,13 +41,16 @@ Use Markdown headings:
 - `## Rubric`
 - `## Outcome`
 
-Fenced shell blocks inside evidence become command evidence.
+Fenced shell blocks inside `## Evidence` become command evidence. Fenced blocks in
+Inputs, Expected Behavior, Forbidden Behavior, Rubric, or any other section are
+kept as note content but do not populate `commands`.
 
 See `docs/SCHEMA.md` for the generated JSON shape.
 
 Multiple input notes are packed into one `evals.json`. Duplicate titles receive stable numeric suffixes so review queues can keep one pack per run batch.
 
-Use `--require-commands` when a regression case must include executable evidence.
+Use `--require-commands` when a regression case must include at least one command
+fenced inside `## Evidence`.
 
 ## Safety Notes
 
