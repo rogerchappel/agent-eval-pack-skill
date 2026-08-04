@@ -76,7 +76,7 @@ export function parseRunNote(inputPath) {
     riskLevel: section(redacted, "Risk Level"),
     tags: parseTags(section(redacted, "Tags")),
     outcome: section(redacted, "Outcome"),
-    commands: extractCommands(redacted)
+    commands: extractCommands(section(redacted, "Evidence"))
   };
 }
 
