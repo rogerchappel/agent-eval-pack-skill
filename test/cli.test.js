@@ -104,3 +104,46 @@ test("cli can print multi-file summaries", () => {
   assert.equal(summary.outcomeCounts.success, 1);
   assert.equal(summary.outcomeCounts.mixed, 1);
 });
+
+test("cli require-commands rejects fenced blocks outside Evidence", () => {
+  const out = "/tmp/agent-eval-pack-excluded-commands-test";
+  rmSync(out, { force: true, recursive: true });
+  const build = spawnSync(
+    "node",
+    ["bin/agent-eval-pack.js", "build", "fixtures/excluded-command-blocks.md", "--out", out],
+    { encoding: "utf8" }
+  );
+  assert.equal(build.status, 0);
+
+  const validate = spawnSync(
+    "node",
+    ["bin/agent-eval-pack.js", "validate", `${out}/evals.json`, "--require-commands"],
+    { encoding: "utf8" }
+  );
+  assert.equal(validate.status, 1);
+  assert.deepEqual(JSON.parse(validate.stdout), {
+    valid: false,
+    errors: ["case 0 missing command evidence."]
+  });
+});
+
+test("cli require-commands accepts commands fenced in Evidence", () => {
+  const out = "/tmp/agent-eval-pack-evidence-commands-test";
+  rmSync(out, { force: true, recursive: true });
+  const build = spawnSync(
+    "node",
+    ["bin/agent-eval-pack.js", "build", "fixtures/mixed-section-commands.md", "--out", out],
+    { encoding: "utf8" }
+  );
+  assert.equal(build.status, 0);
+  const pack = JSON.parse(readFileSync(`${out}/evals.json`, "utf8"));
+  assert.deepEqual(pack.cases[0].commands, ["npm test"]);
+
+  const validate = spawnSync(
+    "node",
+    ["bin/agent-eval-pack.js", "validate", `${out}/evals.json`, "--require-commands"],
+    { encoding: "utf8" }
+  );
+  assert.equal(validate.status, 0);
+  assert.equal(JSON.parse(validate.stdout).valid, true);
+});

@@ -46,6 +46,18 @@ test("can require command evidence", () => {
   assert.equal(validateEvalObject(pack, { requireCommands: true }).valid, false);
 });
 
+test("ignores fenced command blocks outside Evidence", () => {
+  const pack = buildEvalPack("fixtures/excluded-command-blocks.md");
+  assert.deepEqual(pack.cases[0].commands, []);
+  assert.equal(validateEvalObject(pack, { requireCommands: true }).valid, false);
+});
+
+test("extracts commands only from mixed Evidence content", () => {
+  const pack = buildEvalPack("fixtures/mixed-section-commands.md");
+  assert.deepEqual(pack.cases[0].commands, ["npm test"]);
+  assert.equal(validateEvalObject(pack, { requireCommands: true }).valid, true);
+});
+
 test("renders a reviewer brief", () => {
   const pack = buildEvalPack("fixtures/success-run.md");
   assert.match(renderBrief(pack), /Expected Behavior/);
