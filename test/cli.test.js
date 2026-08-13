@@ -19,6 +19,21 @@ test("cli builds and validates a pack", () => {
   assert.equal(validate.status, 0);
 });
 
+for (const [fixture, errors] of [
+  ["fixtures/invalid-null-root.json", ["eval pack must be an object."]],
+  [
+    "fixtures/invalid-case-shapes.json",
+    ["case 0 must be an object.", "case 1 must be an object.", "case 2 must be an object."]
+  ]
+]) {
+  test(`cli returns structured validation errors for ${fixture}`, () => {
+    const result = spawnSync("node", ["bin/agent-eval-pack.js", "validate", fixture], { encoding: "utf8" });
+    assert.equal(result.status, 1);
+    assert.deepEqual(JSON.parse(result.stdout), { valid: false, errors });
+    assert.equal(result.stderr, "");
+  });
+}
+
 test("init template includes review triage fields", () => {
   const out = "/tmp/agent-eval-pack-init-test";
   rmSync(out, { force: true, recursive: true });

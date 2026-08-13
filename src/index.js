@@ -135,10 +135,17 @@ export function buildEvalPack(inputPath, options = {}) {
 
 export function validateEvalObject(pack, options = {}) {
   const errors = [];
+  if (pack === null || typeof pack !== "object" || Array.isArray(pack)) {
+    return { valid: false, errors: ["eval pack must be an object."] };
+  }
   if (pack.schemaVersion !== 1) errors.push("schemaVersion must be 1.");
   if (!Array.isArray(pack.cases) || pack.cases.length === 0) errors.push("cases must be a non-empty array.");
   const ids = new Set();
-  for (const [index, item] of (pack.cases ?? []).entries()) {
+  for (const [index, item] of (Array.isArray(pack.cases) ? pack.cases : []).entries()) {
+    if (item === null || typeof item !== "object" || Array.isArray(item)) {
+      errors.push(`case ${index} must be an object.`);
+      continue;
+    }
     for (const key of ["id", "title", "scenario", "expectedBehavior", "forbiddenBehavior", "rubric"]) {
       if (!item[key] || typeof item[key] !== "string") errors.push(`case ${index} missing ${key}.`);
     }

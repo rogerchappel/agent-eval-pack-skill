@@ -41,6 +41,35 @@ test("validates required eval fields", () => {
   assert.equal(validateEvalObject({ schemaVersion: 1, cases: [{}] }).valid, false);
 });
 
+test("validation rejects non-object pack roots with a stable error", () => {
+  for (const pack of [null, [], "pack", 1, true]) {
+    assert.deepEqual(validateEvalObject(pack), {
+      valid: false,
+      errors: ["eval pack must be an object."]
+    });
+  }
+});
+
+test("validation rejects a non-array cases field without iterating it", () => {
+  assert.deepEqual(validateEvalObject({ schemaVersion: 1, cases: {} }), {
+    valid: false,
+    errors: ["cases must be a non-empty array."]
+  });
+});
+
+test("validation positions errors for non-object case entries", () => {
+  assert.deepEqual(validateEvalObject({ schemaVersion: 1, cases: [null, "case", 1, [], true] }), {
+    valid: false,
+    errors: [
+      "case 0 must be an object.",
+      "case 1 must be an object.",
+      "case 2 must be an object.",
+      "case 3 must be an object.",
+      "case 4 must be an object."
+    ]
+  });
+});
+
 test("can require command evidence", () => {
   const pack = buildEvalPack("fixtures/failure-run.md");
   assert.equal(validateEvalObject(pack, { requireCommands: true }).valid, false);
