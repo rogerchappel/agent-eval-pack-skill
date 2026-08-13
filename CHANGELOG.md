@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Return structured, positioned validation errors for malformed pack and case
+  shapes instead of throwing a JavaScript type error.
 - Preserve input when `HOME` is unavailable and report missing CLI option values
   with controlled usage diagnostics.
 - Add release-readiness checks for package metadata, pack contents, and CI verification.
