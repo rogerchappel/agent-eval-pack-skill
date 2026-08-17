@@ -120,6 +120,25 @@ test("cli can print multi-file summaries", () => {
   assert.equal(summary.outcomeCounts.mixed, 1);
 });
 
+test("cli rejects conflicting build output options before writing output", () => {
+  for (const [first, second] of [
+    ["--stdout", "--summary"],
+    ["--stdout", "--out"],
+    ["--summary", "--out"]
+  ]) {
+    const out = `/tmp/agent-eval-pack-conflict-${first.slice(2)}-${second.slice(2)}`;
+    rmSync(out, { force: true, recursive: true });
+    const cliArgs = ["bin/agent-eval-pack.js", "build", "fixtures/success-run.md", first, second];
+    if (second === "--out") cliArgs.push(out);
+    const result = spawnSync("node", cliArgs, { encoding: "utf8" });
+
+    assert.equal(result.status, 1, `${first} with ${second} should fail`);
+    assert.equal(result.stdout, "");
+    assert.match(result.stderr, /Conflicting output options: .*Choose only one\./);
+    assert.equal(existsSync(out), false, "a rejected --out destination must not be created");
+  }
+});
+
 test("cli require-commands rejects fenced blocks outside Evidence", () => {
   const out = "/tmp/agent-eval-pack-excluded-commands-test";
   rmSync(out, { force: true, recursive: true });

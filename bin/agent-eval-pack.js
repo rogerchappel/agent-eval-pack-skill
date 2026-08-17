@@ -102,6 +102,10 @@ unknown
       "--id-prefix": "value"
     });
     if (inputValues.length === 0) throw new Error("Missing input Markdown file.");
+    const outputModes = ["--out", "--stdout", "--summary"].filter((option) => options[option]);
+    if (outputModes.length > 1) {
+      throw new Error(`Conflicting output options: ${outputModes.join(", ")}. Choose only one.`);
+    }
     const pack = buildEvalPack(inputValues, { idPrefix: options["--id-prefix"] ?? "" });
     if (options["--summary"]) {
       console.log(JSON.stringify(summarizeEvalPack(pack), null, 2));
