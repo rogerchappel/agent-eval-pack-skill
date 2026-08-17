@@ -28,6 +28,9 @@ agent-eval-pack validate dist/success/evals.json --require-commands
 `--out` and `--id-prefix` require a value. If either value is omitted, the CLI
 prints a concise error and the usage guide without a stack trace.
 Unknown options and stray command arguments are rejected with a nonzero exit.
+Build output modes are mutually exclusive: use `--out` to write a directory,
+`--stdout` to print the full pack, or `--summary` to print its summary.
+Combining any of them is an error, so a requested destination is never ignored.
 
 ## Run Note Format
 
