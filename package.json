@@ -38,6 +38,8 @@
     "bin",
     "src",
     "scripts",
+    "fixtures/success-run.md",
+    "fixtures/mixed-run.md",
     "docs",
     "SKILL.md",
     "README.md",
