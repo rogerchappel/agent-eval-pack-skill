@@ -10,20 +10,28 @@ The CLI extracts scenario, inputs, expected behavior, forbidden behavior, eviden
 npm install
 npm run release:check
 npm run smoke
-agent-eval-pack validate dist/smoke/evals.json
+npm exec -- agent-eval-pack validate dist/smoke/evals.json
 ```
 
 ## CLI
 
+From a repository checkout, use `npm exec -- agent-eval-pack` so npm resolves
+the checkout's package binary without requiring a global installation:
+
 ```bash
-agent-eval-pack init --out eval-pack
-agent-eval-pack build fixtures/success-run.md --out dist/success
-agent-eval-pack build fixtures/success-run.md fixtures/mixed-run.md --out dist/nightly --id-prefix nightly
-agent-eval-pack build fixtures/success-run.md --stdout
-agent-eval-pack build fixtures/success-run.md fixtures/mixed-run.md --summary
-agent-eval-pack validate dist/success/evals.json
-agent-eval-pack validate dist/success/evals.json --require-commands
+npm exec -- agent-eval-pack init --out eval-pack
+npm exec -- agent-eval-pack build fixtures/success-run.md --out dist/success
+npm exec -- agent-eval-pack build fixtures/success-run.md fixtures/mixed-run.md --out dist/nightly --id-prefix nightly
+npm exec -- agent-eval-pack build fixtures/success-run.md --stdout
+npm exec -- agent-eval-pack build fixtures/success-run.md fixtures/mixed-run.md --summary
+npm exec -- agent-eval-pack validate dist/success/evals.json
+npm exec -- agent-eval-pack validate dist/success/evals.json --require-commands
 ```
+
+Consumers that install the package in their own project can use the same
+`npm exec -- agent-eval-pack ...` form. A bare `agent-eval-pack ...` command is
+only available when the project's package binaries are already on `PATH`, such
+as inside an npm script.
 
 `--out` and `--id-prefix` require a value. If either value is omitted, the CLI
 prints a concise error and the usage guide without a stack trace.

@@ -20,20 +20,25 @@ The workflow reads local Markdown and writes local JSON/Markdown output. Do not 
 
 ## Workflow
 
+In a repository checkout or a consumer project that has installed the package,
+invoke the local package binary as `npm exec -- agent-eval-pack`. A bare
+`agent-eval-pack` command requires the package binary to already be on `PATH`,
+as it is inside an npm script.
+
 1. Create or inspect the run note.
-2. Run `agent-eval-pack build <input.md...> --out <dir>`.
-3. Run `agent-eval-pack validate <dir>/evals.json`. Add `--require-commands` when
+2. Run `npm exec -- agent-eval-pack build <input.md...> --out <dir>`.
+3. Run `npm exec -- agent-eval-pack validate <dir>/evals.json`. Add `--require-commands` when
    every case must contain a fenced shell command in its `## Evidence` section;
    fenced blocks in other sections do not count.
 4. Review `review-brief.md` for missing scenario, expected behavior, forbidden behavior, or rubric.
-5. For batch review queues, run `agent-eval-pack build <input.md...> --summary` and compare case/outcome counts before sharing.
+5. For batch review queues, run `npm exec -- agent-eval-pack build <input.md...> --summary` and compare case/outcome counts before sharing.
 
 ## Examples
 
 ```bash
-agent-eval-pack build fixtures/success-run.md --out dist/success
-agent-eval-pack build fixtures/success-run.md fixtures/mixed-run.md --out dist/nightly --id-prefix nightly
-agent-eval-pack validate dist/success/evals.json
+npm exec -- agent-eval-pack build fixtures/success-run.md --out dist/success
+npm exec -- agent-eval-pack build fixtures/success-run.md fixtures/mixed-run.md --out dist/nightly --id-prefix nightly
+npm exec -- agent-eval-pack validate dist/success/evals.json
 ```
 
 ## Verification
