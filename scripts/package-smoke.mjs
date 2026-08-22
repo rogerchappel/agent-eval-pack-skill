@@ -45,9 +45,13 @@ try {
   });
 
   const packageDirectory = join(temporaryDirectory, 'node_modules', 'agent-eval-pack-skill');
-  const cli = join(packageDirectory, 'bin', 'agent-eval-pack.js');
-  run(process.execPath, [cli, 'build', join(packageDirectory, 'fixtures', 'success-run.md'), '--out', consumerDirectory]);
-  run(process.execPath, [cli, 'validate', join(consumerDirectory, 'evals.json')]);
+  const documentedCli = ['exec', '--', 'agent-eval-pack'];
+  run('npm', [...documentedCli, 'build', join(packageDirectory, 'fixtures', 'success-run.md'), '--out', consumerDirectory], {
+    cwd: temporaryDirectory
+  });
+  run('npm', [...documentedCli, 'validate', join(consumerDirectory, 'evals.json')], {
+    cwd: temporaryDirectory
+  });
 
   const evals = JSON.parse(readFileSync(join(consumerDirectory, 'evals.json'), 'utf8'));
   if (!Array.isArray(evals.cases) || evals.cases.length !== 1) {
