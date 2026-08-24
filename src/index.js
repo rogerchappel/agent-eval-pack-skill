@@ -40,11 +40,11 @@ export function redact(text) {
 
 export function extractCommands(text) {
   const commands = [];
-  const blockPattern = /```(?:bash|sh|shell|console)?\n([\s\S]*?)```/g;
+  const blockPattern = /```(?:bash|sh|shell|console)?\r?\n([\s\S]*?)```/g;
   for (const match of text.matchAll(blockPattern)) {
     const body = match[1].trim();
     if (!body) continue;
-    commands.push(...body.split("\n").filter((line) => line.trim() && !line.trim().startsWith("#")));
+    commands.push(...body.split(/\r?\n/).filter((line) => line.trim() && !line.trim().startsWith("#")));
   }
   return commands;
 }

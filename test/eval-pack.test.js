@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { spawnSync } from "node:child_process";
 import test from "node:test";
 import {
   buildEvalPack,
+  extractCommands,
   parseRunNote,
   portableSource,
   redact,
@@ -85,6 +90,34 @@ test("extracts commands only from mixed Evidence content", () => {
   const pack = buildEvalPack("fixtures/mixed-section-commands.md");
   assert.deepEqual(pack.cases[0].commands, ["npm test"]);
   assert.equal(validateEvalObject(pack, { requireCommands: true }).valid, true);
+});
+
+test("extracts the same fenced Evidence commands with LF and CRLF", () => {
+  const evidence = "```bash\nnpm run smoke\nnpm test\n```";
+  assert.deepEqual(extractCommands(evidence.replaceAll("\n", "\r\n")), extractCommands(evidence));
+});
+
+test("builds and validates CRLF command evidence with --require-commands", () => {
+  const directory = mkdtempSync(join(tmpdir(), "agent-eval-pack-crlf-"));
+  const notePath = join(directory, "run-note.md");
+  const outPath = join(directory, "pack");
+  const note = readFileSync("fixtures/success-run.md", "utf8").replaceAll("\n", "\r\n");
+  writeFileSync(notePath, note);
+  try {
+    const build = spawnSync(process.execPath, ["bin/agent-eval-pack.js", "build", notePath, "--out", outPath], {
+      encoding: "utf8"
+    });
+    assert.equal(build.status, 0, build.stderr);
+    const validation = spawnSync(process.execPath, [
+      "bin/agent-eval-pack.js",
+      "validate",
+      join(outPath, "evals.json"),
+      "--require-commands"
+    ], { encoding: "utf8" });
+    assert.equal(validation.status, 0, validation.stderr || validation.stdout);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
 });
 
 test("renders a reviewer brief", () => {
