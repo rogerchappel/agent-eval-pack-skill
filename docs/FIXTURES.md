@@ -11,4 +11,9 @@ Good run-note fixtures include:
 - `## Rubric` for future scoring.
 - `## Outcome` as `success`, `failure`, or `mixed`.
 
+Build-time validation requires non-empty `## Scenario`, `## Expected Behavior`,
+and `## Forbidden Behavior` sections in every note. A missing required section
+fails the whole single- or multi-note build before stdout, summary output, or
+output-directory creation.
+
 Review generated output before sharing it outside the local workspace.

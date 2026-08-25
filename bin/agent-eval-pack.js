@@ -1,7 +1,13 @@
 #!/usr/bin/env node
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { buildEvalPack, renderBrief, summarizeEvalPack, validateEvalPack } from "../src/index.js";
+import {
+  buildEvalPack,
+  renderBrief,
+  summarizeEvalPack,
+  validateEvalObject,
+  validateEvalPack
+} from "../src/index.js";
 
 const USAGE = `agent-eval-pack
 
@@ -107,6 +113,10 @@ unknown
       throw new Error(`Conflicting output options: ${outputModes.join(", ")}. Choose only one.`);
     }
     const pack = buildEvalPack(inputValues, { idPrefix: options["--id-prefix"] ?? "" });
+    const validation = validateEvalObject(pack);
+    if (!validation.valid) {
+      throw new Error(`Build validation failed: ${validation.errors.join(" ")}`);
+    }
     if (options["--summary"]) {
       console.log(JSON.stringify(summarizeEvalPack(pack), null, 2));
       process.exit(0);
