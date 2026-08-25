@@ -46,6 +46,31 @@ test("validates required eval fields", () => {
   assert.equal(validateEvalObject({ schemaVersion: 1, cases: [{}] }).valid, false);
 });
 
+for (const [heading, field] of [
+  ["Scenario", "scenario"],
+  ["Expected Behavior", "expectedBehavior"],
+  ["Forbidden Behavior", "forbiddenBehavior"]
+]) {
+  test(`built packs identify a missing ${heading} section`, () => {
+    const directory = mkdtempSync(join(tmpdir(), "agent-eval-pack-incomplete-"));
+    const notePath = join(directory, "run-note.md");
+    const note = readFileSync("fixtures/success-run.md", "utf8").replace(
+      new RegExp(`\\n## ${heading}\\n[\\s\\S]*?(?=\\n## )`),
+      ""
+    );
+    writeFileSync(notePath, note);
+    try {
+      const pack = buildEvalPack(notePath, { generatedAt: "2026-08-25T00:00:00.000Z" });
+      assert.deepEqual(validateEvalObject(pack), {
+        valid: false,
+        errors: [`case 0 missing ${field}.`]
+      });
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+}
+
 test("validation rejects non-object pack roots with a stable error", () => {
   for (const pack of [null, [], "pack", 1, true]) {
     assert.deepEqual(validateEvalObject(pack), {

@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import test from "node:test";
+
+const incompleteNote = "/tmp/agent-eval-pack-incomplete-note.md";
 
 test("cli builds and validates a pack", () => {
   const out = "/tmp/agent-eval-pack-cli-test";
@@ -118,6 +120,51 @@ test("cli can print multi-file summaries", () => {
   assert.equal(summary.caseCount, 2);
   assert.equal(summary.outcomeCounts.success, 1);
   assert.equal(summary.outcomeCounts.mixed, 1);
+});
+
+for (const [heading, field] of [
+  ["Scenario", "scenario"],
+  ["Expected Behavior", "expectedBehavior"],
+  ["Forbidden Behavior", "forbiddenBehavior"]
+]) {
+  for (const mode of ["--out", "--stdout", "--summary"]) {
+    test(`cli rejects a missing ${heading} section with ${mode} before output`, () => {
+      const source = readFileSync("fixtures/success-run.md", "utf8").replace(
+        new RegExp(`\\n## ${heading}\\n[\\s\\S]*?(?=\\n## )`),
+        ""
+      );
+      const out = `/tmp/agent-eval-pack-incomplete-${field}-${mode.slice(2)}`;
+      rmSync(out, { recursive: true, force: true });
+      writeFileSync(incompleteNote, source);
+      const args = ["bin/agent-eval-pack.js", "build", incompleteNote, mode];
+      if (mode === "--out") args.push(out);
+      const result = spawnSync("node", args, { encoding: "utf8" });
+
+      assert.equal(result.status, 1);
+      assert.equal(result.stdout, "");
+      assert.match(result.stderr, new RegExp(`Build validation failed: case 0 missing ${field}\\.`));
+      assert.equal(existsSync(out), false);
+    });
+  }
+}
+
+test("cli reports the incomplete case in a multi-note build", () => {
+  const source = readFileSync("fixtures/success-run.md", "utf8").replace(
+    /\n## Forbidden Behavior\n[\s\S]*?(?=\n## )/,
+    ""
+  );
+  writeFileSync(incompleteNote, source);
+  const result = spawnSync("node", [
+    "bin/agent-eval-pack.js",
+    "build",
+    "fixtures/success-run.md",
+    incompleteNote,
+    "--stdout"
+  ], { encoding: "utf8" });
+
+  assert.equal(result.status, 1);
+  assert.equal(result.stdout, "");
+  assert.match(result.stderr, /Build validation failed: case 1 missing forbiddenBehavior\./);
 });
 
 test("cli rejects conflicting build output options before writing output", () => {
