@@ -39,6 +39,10 @@ Unknown options and stray command arguments are rejected with a nonzero exit.
 Build output modes are mutually exclusive: use `--out` to write a directory,
 `--stdout` to print the full pack, or `--summary` to print its summary.
 Combining any of them is an error, so a requested destination is never ignored.
+Every build validates the complete in-memory pack before printing or writing.
+If any input omits required Scenario, Expected Behavior, or Forbidden Behavior
+content, the command identifies the case and field, exits nonzero, and creates no
+partial output.
 
 ## Run Note Format
 
@@ -51,6 +55,10 @@ Use Markdown headings:
 - `## Evidence`
 - `## Rubric`
 - `## Outcome`
+
+Scenario, Expected Behavior, and Forbidden Behavior must each contain text.
+Inputs, Evidence, Rubric, and Outcome remain optional; the builder supplies the
+documented defaults where applicable.
 
 Fenced shell blocks inside `## Evidence` become command evidence. Fenced blocks in
 Inputs, Expected Behavior, Forbidden Behavior, Rubric, or any other section are
