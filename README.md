@@ -36,6 +36,8 @@ as inside an npm script.
 `--out` and `--id-prefix` require a value. If either value is omitted, the CLI
 prints a concise error and the usage guide without a stack trace.
 Unknown options and stray command arguments are rejected with a nonzero exit.
+Each option may appear only once per command; duplicate value or boolean options
+are rejected before the CLI prints or writes any output.
 Build output modes are mutually exclusive: use `--out` to write a directory,
 `--stdout` to print the full pack, or `--summary` to print its summary.
 Combining any of them is an error, so a requested destination is never ignored.
