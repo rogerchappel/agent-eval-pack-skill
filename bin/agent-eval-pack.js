@@ -40,6 +40,7 @@ function parseOptions(values, definitions) {
     }
     const kind = definitions[value];
     if (!kind) throw new Error(`Unknown option: ${value}`);
+    if (Object.hasOwn(options, value)) throw new Error(`Duplicate option: ${value}.`);
     if (kind === "value") {
       const optionValue = values[index + 1];
       if (!optionValue || optionValue.startsWith("-")) throw new Error(`Missing value for ${value}.`);
