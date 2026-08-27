@@ -68,6 +68,24 @@ for (const flag of ["--out", "--id-prefix"]) {
   });
 }
 
+for (const [name, cliArgs, outputPath] of [
+  ["init --out", ["init", "--out", "/tmp/agent-eval-pack-duplicate-init-a", "--out", "/tmp/agent-eval-pack-duplicate-init-b"], "/tmp/agent-eval-pack-duplicate-init-b"],
+  ["build --out", ["build", "fixtures/success-run.md", "--out", "/tmp/agent-eval-pack-duplicate-build-a", "--out", "/tmp/agent-eval-pack-duplicate-build-b"], "/tmp/agent-eval-pack-duplicate-build-b"],
+  ["build --id-prefix", ["build", "fixtures/success-run.md", "--id-prefix", "first", "--id-prefix", "second", "--stdout"], null],
+  ["build --stdout", ["build", "fixtures/success-run.md", "--stdout", "--stdout"], null],
+  ["validate --require-commands", ["validate", "fixtures/invalid-null-root.json", "--require-commands", "--require-commands"], null]
+]) {
+  test(`cli rejects duplicate ${name} before producing output`, () => {
+    if (outputPath) rmSync(outputPath, { force: true, recursive: true });
+    const result = spawnSync("node", ["bin/agent-eval-pack.js", ...cliArgs], { encoding: "utf8" });
+
+    assert.equal(result.status, 1);
+    assert.equal(result.stdout, "");
+    assert.match(result.stderr, new RegExp(`Duplicate option: ${name.split(" ")[1]}\\.`));
+    if (outputPath) assert.equal(existsSync(outputPath), false);
+  });
+}
+
 for (const [name, cliArgs, message] of [
   ["unknown build options", ["build", "fixtures/success-run.md", "--typo"], /Unknown option: --typo/],
   ["build-only options on init", ["init", "--stdout"], /Unknown option: --stdout/],
