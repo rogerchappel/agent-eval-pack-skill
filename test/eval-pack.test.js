@@ -46,6 +46,34 @@ test("validates required eval fields", () => {
   assert.equal(validateEvalObject({ schemaVersion: 1, cases: [{}] }).valid, false);
 });
 
+test("validation rejects blank required strings and malformed tags", () => {
+  const pack = buildEvalPack("fixtures/mixed-run.md");
+  Object.assign(pack.cases[0], {
+    id: "   ",
+    title: "\t",
+    scenario: "\n",
+    expectedBehavior: " ",
+    forbiddenBehavior: "\r\n",
+    rubric: "  ",
+    tags: ["regression", " ", 42, null]
+  });
+
+  assert.deepEqual(validateEvalObject(pack), {
+    valid: false,
+    errors: [
+      "case 0 missing id.",
+      "case 0 missing title.",
+      "case 0 missing scenario.",
+      "case 0 missing expectedBehavior.",
+      "case 0 missing forbiddenBehavior.",
+      "case 0 missing rubric.",
+      "case 0 tag 1 must be a non-empty string.",
+      "case 0 tag 2 must be a non-empty string.",
+      "case 0 tag 3 must be a non-empty string."
+    ]
+  });
+});
+
 for (const [heading, field] of [
   ["Scenario", "scenario"],
   ["Expected Behavior", "expectedBehavior"],
