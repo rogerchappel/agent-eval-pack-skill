@@ -147,14 +147,25 @@ export function validateEvalObject(pack, options = {}) {
       continue;
     }
     for (const key of ["id", "title", "scenario", "expectedBehavior", "forbiddenBehavior", "rubric"]) {
-      if (!item[key] || typeof item[key] !== "string") errors.push(`case ${index} missing ${key}.`);
+      if (typeof item[key] !== "string" || item[key].trim().length === 0) {
+        errors.push(`case ${index} missing ${key}.`);
+      }
     }
-    if (item.id && ids.has(item.id)) errors.push(`case ${index} duplicates id ${item.id}.`);
-    if (item.id) ids.add(item.id);
+    const validId = typeof item.id === "string" && item.id.trim().length > 0;
+    if (validId && ids.has(item.id)) errors.push(`case ${index} duplicates id ${item.id}.`);
+    if (validId) ids.add(item.id);
     if (options.requireCommands && (!Array.isArray(item.commands) || item.commands.length === 0)) {
       errors.push(`case ${index} missing command evidence.`);
     }
-    if (item.tags && !Array.isArray(item.tags)) errors.push(`case ${index} tags must be an array.`);
+    if (item.tags !== undefined && !Array.isArray(item.tags)) {
+      errors.push(`case ${index} tags must be an array.`);
+    } else if (Array.isArray(item.tags)) {
+      for (const [tagIndex, tag] of item.tags.entries()) {
+        if (typeof tag !== "string" || tag.trim().length === 0) {
+          errors.push(`case ${index} tag ${tagIndex} must be a non-empty string.`);
+        }
+      }
+    }
   }
   return { valid: errors.length === 0, errors };
 }
