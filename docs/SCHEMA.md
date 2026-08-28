@@ -30,7 +30,10 @@
 `validate` accepts a JSON object whose `schemaVersion` is `1` and whose `cases`
 field is a non-empty array of objects. It requires `id`, `title`, `scenario`,
 `expectedBehavior`, `forbiddenBehavior`, and `rubric` for every case. When
-present, `tags` must be an array.
+present, each required field must be a non-empty string after trimming
+whitespace. `tags` must be an array when present, and every tag must likewise
+be a non-empty string after trimming; validation rejects blank tags rather than
+normalizing or discarding them.
 
 Invalid shapes return JSON in the form `{ "valid": false, "errors": [...] }`
 and exit with status 1. Root errors identify the eval pack; malformed case

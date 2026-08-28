@@ -21,6 +21,37 @@ test("cli builds and validates a pack", () => {
   assert.equal(validate.status, 0);
 });
 
+test("cli rejects blank required strings and malformed tags", () => {
+  const path = "/tmp/agent-eval-pack-invalid-strings.json";
+  writeFileSync(path, JSON.stringify({
+    schemaVersion: 1,
+    cases: [{
+      id: "valid-id",
+      title: " ",
+      scenario: "scenario",
+      expectedBehavior: "expected",
+      forbiddenBehavior: "forbidden",
+      rubric: "rubric",
+      tags: ["valid", "\t", {}]
+    }]
+  }));
+  try {
+    const result = spawnSync("node", ["bin/agent-eval-pack.js", "validate", path], { encoding: "utf8" });
+    assert.equal(result.status, 1);
+    assert.deepEqual(JSON.parse(result.stdout), {
+      valid: false,
+      errors: [
+        "case 0 missing title.",
+        "case 0 tag 1 must be a non-empty string.",
+        "case 0 tag 2 must be a non-empty string."
+      ]
+    });
+    assert.equal(result.stderr, "");
+  } finally {
+    rmSync(path, { force: true });
+  }
+});
+
 for (const [fixture, errors] of [
   ["fixtures/invalid-null-root.json", ["eval pack must be an object."]],
   [
