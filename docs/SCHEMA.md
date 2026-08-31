@@ -43,5 +43,8 @@ so callers can parse them without filtering CLI usage text.
 
 `commands` contains non-comment lines from fenced shell blocks within the
 `## Evidence` section only. Fenced blocks in other note sections do not populate
-this field. `validate --require-commands` requires this array to contain at least
-one Evidence command for every case.
+this field. When present, `commands` must be an array and every entry must be a
+non-empty string after trimming whitespace; validation reports malformed entries
+by their zero-based case and command positions. `validate --require-commands`
+additionally requires the array to contain at least one valid Evidence command
+for every case.
