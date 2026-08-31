@@ -133,6 +133,30 @@ test("can require command evidence", () => {
   assert.equal(validateEvalObject(pack, { requireCommands: true }).valid, false);
 });
 
+test("validation rejects malformed command entries with positioned errors", () => {
+  const pack = buildEvalPack("fixtures/success-run.md");
+  pack.cases[0].commands = ["npm test", " ", null, 42];
+
+  assert.deepEqual(validateEvalObject(pack), {
+    valid: false,
+    errors: [
+      "case 0 command 1 must be a non-empty string.",
+      "case 0 command 2 must be a non-empty string.",
+      "case 0 command 3 must be a non-empty string."
+    ]
+  });
+});
+
+test("require-commands accepts only arrays containing non-empty command strings", () => {
+  const pack = buildEvalPack("fixtures/success-run.md");
+  for (const commands of [undefined, [], null, [""], [" \t"], [false]]) {
+    pack.cases[0].commands = commands;
+    assert.equal(validateEvalObject(pack, { requireCommands: true }).valid, false);
+  }
+  pack.cases[0].commands = ["npm test"];
+  assert.equal(validateEvalObject(pack, { requireCommands: true }).valid, true);
+});
+
 test("ignores fenced command blocks outside Evidence", () => {
   const pack = buildEvalPack("fixtures/excluded-command-blocks.md");
   assert.deepEqual(pack.cases[0].commands, []);

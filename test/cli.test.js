@@ -277,3 +277,26 @@ test("cli require-commands accepts commands fenced in Evidence", () => {
   assert.equal(validate.status, 0);
   assert.equal(JSON.parse(validate.stdout).valid, true);
 });
+
+test("cli require-commands rejects malformed command entries", () => {
+  const path = "/tmp/agent-eval-pack-invalid-commands.json";
+  const validCase = {
+    id: "command-contract",
+    title: "Command contract",
+    scenario: "scenario",
+    expectedBehavior: "expected",
+    forbiddenBehavior: "forbidden",
+    rubric: "rubric"
+  };
+
+  for (const commands of [null, [""], ["  "], [42]]) {
+    writeFileSync(path, JSON.stringify({ schemaVersion: 1, cases: [{ ...validCase, commands }] }));
+    const result = spawnSync(
+      "node",
+      ["bin/agent-eval-pack.js", "validate", path, "--require-commands"],
+      { encoding: "utf8" }
+    );
+    assert.equal(result.status, 1);
+    assert.equal(JSON.parse(result.stdout).valid, false);
+  }
+});
