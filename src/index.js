@@ -154,7 +154,16 @@ export function validateEvalObject(pack, options = {}) {
     const validId = typeof item.id === "string" && item.id.trim().length > 0;
     if (validId && ids.has(item.id)) errors.push(`case ${index} duplicates id ${item.id}.`);
     if (validId) ids.add(item.id);
-    if (options.requireCommands && (!Array.isArray(item.commands) || item.commands.length === 0)) {
+    if (item.commands !== undefined && !Array.isArray(item.commands)) {
+      errors.push(`case ${index} commands must be an array.`);
+    } else if (Array.isArray(item.commands)) {
+      for (const [commandIndex, command] of item.commands.entries()) {
+        if (typeof command !== "string" || command.trim().length === 0) {
+          errors.push(`case ${index} command ${commandIndex} must be a non-empty string.`);
+        }
+      }
+    }
+    if (options.requireCommands && (item.commands === undefined || (Array.isArray(item.commands) && item.commands.length === 0))) {
       errors.push(`case ${index} missing command evidence.`);
     }
     if (item.tags !== undefined && !Array.isArray(item.tags)) {
