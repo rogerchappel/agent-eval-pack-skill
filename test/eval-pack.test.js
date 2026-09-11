@@ -169,6 +169,27 @@ test("extracts commands only from mixed Evidence content", () => {
   assert.equal(validateEvalObject(pack, { requireCommands: true }).valid, true);
 });
 
+test("extracts shell commands from Evidence with non-shell fences before them", () => {
+  const pack = buildEvalPack("fixtures/mixed-fences.md");
+  assert.deepEqual(pack.cases[0].commands, ["npm test"]);
+  assert.equal(validateEvalObject(pack, { requireCommands: true }).valid, true);
+});
+
+test("unlabeled Evidence fences contribute command lines like shell fences", () => {
+  const evidence = "```\nnpm run smoke\n```";
+  assert.deepEqual(extractCommands(evidence), ["npm run smoke"]);
+});
+
+test("non-shell Evidence fences contribute no commands and cannot corrupt pairing", () => {
+  const evidence = "```json\n{ \"passing\": true }\n```\nprose stays out\n```bash\nnpm test\n```";
+  assert.deepEqual(extractCommands(evidence), ["npm test"]);
+});
+
+test("extracts the same mixed-fence Evidence commands with LF and CRLF", () => {
+  const note = readFileSync("fixtures/mixed-fences.md", "utf8");
+  assert.deepEqual(extractCommands(note.replaceAll("\n", "\r\n")), extractCommands(note));
+});
+
 test("extracts the same fenced Evidence commands with LF and CRLF", () => {
   const evidence = "```bash\nnpm run smoke\nnpm test\n```";
   assert.deepEqual(extractCommands(evidence.replaceAll("\n", "\r\n")), extractCommands(evidence));

@@ -38,13 +38,27 @@ export function redact(text) {
   return output;
 }
 
+const SHELL_FENCE_LABELS = new Set(["bash", "sh", "shell", "console"]);
+
 export function extractCommands(text) {
   const commands = [];
-  const blockPattern = /```(?:bash|sh|shell|console)?\r?\n([\s\S]*?)```/g;
-  for (const match of text.matchAll(blockPattern)) {
-    const body = match[1].trim();
-    if (!body) continue;
-    commands.push(...body.split(/\r?\n/).filter((line) => line.trim() && !line.trim().startsWith("#")));
+  let insideFence = false;
+  let shellFence = false;
+  for (const line of text.split(/\r?\n/)) {
+    if (line.trimStart().startsWith("```")) {
+      if (insideFence) {
+        insideFence = false;
+        shellFence = false;
+        continue;
+      }
+      const label = line.trim().slice(3).trim();
+      insideFence = true;
+      shellFence = label === "" || SHELL_FENCE_LABELS.has(label);
+      continue;
+    }
+    if (!insideFence || !shellFence) continue;
+    const trimmed = line.trim();
+    if (trimmed && !trimmed.startsWith("#")) commands.push(line);
   }
   return commands;
 }
@@ -182,7 +196,13 @@ export function validateEvalObject(pack, options = {}) {
 export function validateEvalPack(inputPath, options = {}) {
   const path = resolve(inputPath);
   if (!existsSync(path)) return { valid: false, errors: [`File not found: ${inputPath}`] };
-  return validateEvalObject(JSON.parse(readFileSync(path, "utf8")), options);
+  let pack;
+  try {
+    pack = JSON.parse(readFileSync(path, "utf8"));
+  } catch (error) {
+    return { valid: false, errors: [`eval pack is not parseable JSON: ${error.message}`] };
+  }
+  return validateEvalObject(pack, options);
 }
 
 export function renderBrief(pack) {

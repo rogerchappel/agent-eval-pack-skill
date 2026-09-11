@@ -62,9 +62,13 @@ Scenario, Expected Behavior, and Forbidden Behavior must each contain text.
 Inputs, Evidence, Rubric, and Outcome remain optional; the builder supplies the
 documented defaults where applicable.
 
-Fenced shell blocks inside `## Evidence` become command evidence. Fenced blocks in
-Inputs, Expected Behavior, Forbidden Behavior, Rubric, or any other section are
-kept as note content but do not populate `commands`.
+Fenced shell blocks inside `## Evidence` become command evidence. A fence
+labeled `bash`, `sh`, `shell`, or `console` is a shell block, and an unlabeled
+fence is treated as a shell block; other language labels (such as `json`) are
+kept as note content and never affect later shell fences. Prose between fences
+is never recorded as a command. Fenced blocks in Inputs, Expected Behavior,
+Forbidden Behavior, Rubric, or any other section are kept as note content but do
+not populate `commands`.
 
 See `docs/SCHEMA.md` for the generated JSON shape.
 

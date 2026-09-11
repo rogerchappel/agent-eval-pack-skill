@@ -6,6 +6,12 @@
   package during release checks.
 - Return structured, positioned validation errors for malformed pack and case
   shapes instead of throwing a JavaScript type error.
+- Pair `## Evidence` fences line by line so shell command evidence survives
+  neighboring non-shell fences and prose between fences is never recorded as a
+  command.
+- Return structured validation errors for unparseable `validate` input on
+  standard output with exit status 1, as documented, instead of printing a
+  JavaScript parse error to standard error.
 - Preserve input when `HOME` is unavailable and report missing CLI option values
   with controlled usage diagnostics.
 - Add release-readiness checks for package metadata, pack contents, and CI verification.

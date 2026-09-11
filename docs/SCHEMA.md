@@ -36,14 +36,20 @@ be a non-empty string after trimming; validation rejects blank tags rather than
 normalizing or discarding them.
 
 Invalid shapes return JSON in the form `{ "valid": false, "errors": [...] }`
-and exit with status 1. Root errors identify the eval pack; malformed case
+and exit with status 1. Files that are not parseable JSON return the same shape
+with a root error identifying the parse failure. Root errors identify the eval pack; malformed case
 entries identify their zero-based position (for example,
 `case 2 must be an object.`). Validation errors are written to standard output,
 so callers can parse them without filtering CLI usage text.
 
 `commands` contains non-comment lines from fenced shell blocks within the
-`## Evidence` section only. Fenced blocks in other note sections do not populate
-this field. When present, `commands` must be an array and every entry must be a
+`## Evidence` section only. A fence labeled `bash`, `sh`, `shell`, or `console`
+is a shell block, and an unlabeled fence is treated as a shell block; fences
+labeled with any other language (for example `json`) are ignored. Fence pairing
+is decided line by line, so a non-shell fence never alters how later shell
+fences are read, prose between fences is never recorded as a command, and
+comment lines inside a shell fence are skipped. Fenced blocks in other note
+sections do not populate this field. When present, `commands` must be an array and every entry must be a
 non-empty string after trimming whitespace; validation reports malformed entries
 by their zero-based case and command positions. `validate --require-commands`
 additionally requires the array to contain at least one valid Evidence command
