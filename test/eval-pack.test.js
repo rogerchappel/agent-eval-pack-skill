@@ -169,6 +169,17 @@ test("extracts commands only from mixed Evidence content", () => {
   assert.equal(validateEvalObject(pack, { requireCommands: true }).valid, true);
 });
 
+test("extracts shell commands from Evidence with non-shell fences before them", () => {
+  const pack = buildEvalPack("fixtures/mixed-fences.md");
+  assert.deepEqual(pack.cases[0].commands, ["npm test"]);
+  assert.equal(validateEvalObject(pack, { requireCommands: true }).valid, true);
+});
+
+test("extracts the same mixed-fence Evidence commands with LF and CRLF", () => {
+  const note = readFileSync("fixtures/mixed-fences.md", "utf8");
+  assert.deepEqual(extractCommands(note.replaceAll("\n", "\r\n")), extractCommands(note));
+});
+
 test("extracts the same fenced Evidence commands with LF and CRLF", () => {
   const evidence = "```bash\nnpm run smoke\nnpm test\n```";
   assert.deepEqual(extractCommands(evidence.replaceAll("\n", "\r\n")), extractCommands(evidence));
