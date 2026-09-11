@@ -67,6 +67,18 @@ for (const [fixture, errors] of [
   });
 }
 
+test("cli returns structured validation errors for unparseable JSON", () => {
+  const result = spawnSync("node", ["bin/agent-eval-pack.js", "validate", "fixtures/unparseable-evals.json"], {
+    encoding: "utf8"
+  });
+  assert.equal(result.status, 1);
+  const parsed = JSON.parse(result.stdout);
+  assert.equal(parsed.valid, false);
+  assert.equal(parsed.errors.length, 1);
+  assert.match(parsed.errors[0], /^eval pack is not parseable JSON:/);
+  assert.equal(result.stderr, "");
+});
+
 test("init template includes review triage fields", () => {
   const out = "/tmp/agent-eval-pack-init-test";
   rmSync(out, { force: true, recursive: true });
