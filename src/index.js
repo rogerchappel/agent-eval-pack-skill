@@ -196,7 +196,13 @@ export function validateEvalObject(pack, options = {}) {
 export function validateEvalPack(inputPath, options = {}) {
   const path = resolve(inputPath);
   if (!existsSync(path)) return { valid: false, errors: [`File not found: ${inputPath}`] };
-  return validateEvalObject(JSON.parse(readFileSync(path, "utf8")), options);
+  let pack;
+  try {
+    pack = JSON.parse(readFileSync(path, "utf8"));
+  } catch (error) {
+    return { valid: false, errors: [`eval pack is not parseable JSON: ${error.message}`] };
+  }
+  return validateEvalObject(pack, options);
 }
 
 export function renderBrief(pack) {
