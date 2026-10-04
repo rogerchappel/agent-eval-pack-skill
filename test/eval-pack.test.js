@@ -108,6 +108,19 @@ test("validation rejects non-object pack roots with a stable error", () => {
   }
 });
 
+test("validation rejects missing and unsupported schema versions with a stable error", () => {
+  const validCase = buildEvalPack("fixtures/success-run.md").cases[0];
+  for (const pack of [
+    { cases: [validCase] },
+    { schemaVersion: 2, cases: [validCase] }
+  ]) {
+    assert.deepEqual(validateEvalObject(pack), {
+      valid: false,
+      errors: ["schemaVersion must be 1."]
+    });
+  }
+});
+
 test("validation rejects a non-array cases field without iterating it", () => {
   assert.deepEqual(validateEvalObject({ schemaVersion: 1, cases: {} }), {
     valid: false,
