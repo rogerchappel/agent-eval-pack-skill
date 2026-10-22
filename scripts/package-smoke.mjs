@@ -23,6 +23,8 @@ try {
     'src/index.js',
     'fixtures/success-run.md',
     'fixtures/mixed-run.md',
+    'fixtures/failure-run.md',
+    'fixtures/invalid-case-shapes.json',
     'docs/SCHEMA.md',
     'docs/REDACTION.md',
     'docs/RELEASE_CANDIDATE.md',
